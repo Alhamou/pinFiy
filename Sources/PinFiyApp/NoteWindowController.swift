@@ -5,9 +5,25 @@ final class NotePanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
 
-    override func mouseDown(with event: NSEvent) {
-        orderFrontRegardless()
-        super.mouseDown(with: event)
+    override func sendEvent(_ event: NSEvent) {
+        if event.type == .leftMouseDown || event.type == .rightMouseDown {
+            NSApp.activate(ignoringOtherApps: true)
+            orderFrontRegardless()
+            makeKey()
+            makeMain()
+        }
+        super.sendEvent(event)
+    }
+}
+
+final class NoteTextView: NSTextView {
+    override func paste(_ sender: Any?) {
+        guard isEditable else { return }
+        if let string = NSPasteboard.general.string(forType: .string) {
+            insertText(string, replacementRange: selectedRange())
+            return
+        }
+        super.paste(sender)
     }
 }
 
@@ -28,7 +44,7 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
     private let topBar = ChromeBar()
     private let colorBar = ChromeBar()
     private let textScroll = NSScrollView()
-    private let textView = NSTextView()
+    private let textView = NoteTextView()
     private let placeholder = PassThroughTextField(labelWithString: L10n.placeholder)
     private let pinButton = NSButton()
     private let lockButton = NSButton()

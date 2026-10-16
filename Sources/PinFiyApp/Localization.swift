@@ -11,6 +11,11 @@ enum L10n {
     static var togglePin: String { systemIsArabic ? "تثبيت" : "Pin" }
     static var settings: String { systemIsArabic ? "الإعدادات" : "Settings" }
     static var quit: String { systemIsArabic ? "إنهاء" : "Quit" }
+    static var edit: String { systemIsArabic ? "تحرير" : "Edit" }
+    static var cut: String { systemIsArabic ? "قص" : "Cut" }
+    static var copy: String { systemIsArabic ? "نسخ" : "Copy" }
+    static var paste: String { systemIsArabic ? "لصق" : "Paste" }
+    static var selectAll: String { systemIsArabic ? "تحديد الكل" : "Select All" }
     static var placeholder: String { systemIsArabic ? "اكتب ملاحظتك" : "Write a note" }
     static var deleteTitle: String { systemIsArabic ? "حذف هذه الملاحظة؟" : "Delete this note?" }
     static var deleteButton: String { systemIsArabic ? "حذف" : "Delete" }

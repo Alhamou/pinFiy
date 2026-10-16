@@ -29,6 +29,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             show(note)
         }
         NSApp.activate(ignoringOtherApps: true)
+        installEditingShortcuts()
+    }
+
+    private func installEditingShortcuts() {
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            guard flags == .command,
+                  let key = event.charactersIgnoringModifiers?.lowercased() else { return event }
+            let selector: Selector
+            switch key {
+            case "x": selector = #selector(NSText.cut(_:))
+            case "c": selector = #selector(NSText.copy(_:))
+            case "v": selector = #selector(NSText.paste(_:))
+            case "a": selector = #selector(NSText.selectAll(_:))
+            default: return event
+            }
+            guard let responder = NSApp.keyWindow?.firstResponder, responder.responds(to: selector) else {
+                return event
+            }
+            responder.perform(selector, with: nil)
+            return nil
+        }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -60,7 +82,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             menu.addItem(item)
         }
         appItem.submenu = menu
+        main.addItem(editMenuItem())
         NSApp.mainMenu = main
+    }
+
+    private func editMenuItem() -> NSMenuItem {
+        let item = NSMenuItem()
+        let menu = NSMenu(title: L10n.edit)
+        menu.addItem(editAction(L10n.cut, #selector(NSText.cut(_:)), "x"))
+        menu.addItem(editAction(L10n.copy, #selector(NSText.copy(_:)), "c"))
+        menu.addItem(editAction(L10n.paste, #selector(NSText.paste(_:)), "v"))
+        menu.addItem(.separator())
+        menu.addItem(editAction(L10n.selectAll, #selector(NSText.selectAll(_:)), "a"))
+        item.submenu = menu
+        return item
+    }
+
+    private func editAction(_ title: String, _ action: Selector, _ key: String) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: action, keyEquivalent: key)
+        item.keyEquivalentModifierMask = .command
+        return item
     }
 
     private func installStatusItem() {
