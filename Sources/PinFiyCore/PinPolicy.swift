@@ -29,8 +29,8 @@ public enum PinPolicy {
         if pinned {
             return PinWindowPolicy(
                 level: .floating,
-                joinsAllSpaces: true,
-                fullScreenAuxiliary: true,
+                joinsAllSpaces: false,
+                fullScreenAuxiliary: false,
                 coversMenuBar: false
             )
         }

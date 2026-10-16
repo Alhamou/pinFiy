@@ -10,11 +10,11 @@ final class PinPolicyTests: XCTestCase {
         XCTAssertFalse(policy.coversMenuBar)
     }
 
-    func testPinnedFloatsOnAllSpacesWithoutCoveringMenuBar() {
+    func testPinnedFloatsOnTheDesktopWithoutCoveringMenuBarOrFullScreenApps() {
         let policy = PinPolicy.policy(pinned: true)
         XCTAssertEqual(policy.level, .floating)
-        XCTAssertTrue(policy.joinsAllSpaces)
-        XCTAssertTrue(policy.fullScreenAuxiliary)
+        XCTAssertFalse(policy.joinsAllSpaces)
+        XCTAssertFalse(policy.fullScreenAuxiliary)
         XCTAssertFalse(policy.coversMenuBar)
     }
 }
