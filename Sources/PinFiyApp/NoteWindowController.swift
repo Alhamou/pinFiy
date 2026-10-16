@@ -600,20 +600,6 @@ enum NoteResizeEdge {
     }
 
     var cursor: NSCursor {
-        if #available(macOS 15.0, *) {
-            let position: NSCursor.FrameResizePosition
-            switch self {
-            case .left: position = .left
-            case .right: position = .right
-            case .top: position = .top
-            case .bottom: position = .bottom
-            case .topLeft: position = .topLeft
-            case .topRight: position = .topRight
-            case .bottomLeft: position = .bottomLeft
-            case .bottomRight: position = .bottomRight
-            }
-            return NSCursor.frameResize(position: position, directions: .all)
-        }
         switch self {
         case .left, .right:
             return .resizeLeftRight
