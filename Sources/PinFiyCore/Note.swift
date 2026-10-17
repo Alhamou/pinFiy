@@ -25,7 +25,7 @@ public struct Note: Codable, Equatable, Identifiable, Sendable {
         locked: Bool = false
     ) {
         self.id = id
-        self.text = text
+        self.text = ArabicNumerals.convertToEnglish(text)
         self.x = x
         self.y = y
         self.width = width
@@ -95,7 +95,8 @@ extension Note {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
-        text = try container.decode(String.self, forKey: .text)
+        let rawText = try container.decode(String.self, forKey: .text)
+        text = ArabicNumerals.convertToEnglish(rawText)
         x = try container.decode(Double.self, forKey: .x)
         y = try container.decode(Double.self, forKey: .y)
         width = try container.decode(Double.self, forKey: .width)
@@ -122,6 +123,7 @@ extension Note {
 
     public func normalized() -> Note {
         var copy = self
+        copy.text = ArabicNumerals.convertToEnglish(copy.text)
         copy.fontSize = FontSize.clamp(copy.fontSize)
         let size = NoteMetrics.clamp(width: copy.width, height: copy.height)
         copy.width = size.width

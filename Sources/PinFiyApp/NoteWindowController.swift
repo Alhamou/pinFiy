@@ -17,10 +17,28 @@ final class NotePanel: NSPanel {
 }
 
 final class NoteTextView: NSTextView {
+    override func insertText(_ string: Any, replacementRange: NSRange) {
+        guard isEditable else { return }
+        if let text = string as? String {
+            let converted = ArabicNumerals.convertToEnglish(text)
+            super.insertText(converted, replacementRange: replacementRange)
+            return
+        }
+        if let attr = string as? NSAttributedString {
+            let converted = ArabicNumerals.convertToEnglish(attr.string)
+            let mutable = NSMutableAttributedString(attributedString: attr)
+            mutable.mutableString.setString(converted)
+            super.insertText(mutable, replacementRange: replacementRange)
+            return
+        }
+        super.insertText(string, replacementRange: replacementRange)
+    }
+
     override func paste(_ sender: Any?) {
         guard isEditable else { return }
         if let string = NSPasteboard.general.string(forType: .string) {
-            insertText(string, replacementRange: selectedRange())
+            let converted = ArabicNumerals.convertToEnglish(string)
+            insertText(converted, replacementRange: selectedRange())
             return
         }
         super.paste(sender)
@@ -539,7 +557,19 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
             isApplying = false
             return
         }
-        note.text = textView.string
+        let raw = textView.string
+        let converted = ArabicNumerals.convertToEnglish(raw)
+        if converted != raw {
+            isApplying = true
+            let selectedRange = textView.selectedRange()
+            textView.string = converted
+            let length = (converted as NSString).length
+            let clampedLocation = min(selectedRange.location, length)
+            let clampedLength = min(selectedRange.length, length - clampedLocation)
+            textView.setSelectedRange(NSRange(location: clampedLocation, length: clampedLength))
+            isApplying = false
+        }
+        note.text = converted
         applyStyle()
         publish()
     }
